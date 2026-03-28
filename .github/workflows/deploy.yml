@@ -1,0 +1,24 @@
+name: Deploy to OpenShift
+
+on:
+  push:
+    branches:
+      - docker
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install OC
+      run: |
+        curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
+        tar -xf openshift-client-linux.tar.gz
+        sudo mv oc /usr/local/bin/
+
+    - name: Login to OpenShift
+      run: |
+        oc login --token=${{ secrets.OC_TOKEN }} --server=https://api.cluster-dvdfw.dvdfw.sandbox2448.opentlc.com:6443 --insecure-skip-tls-verify
+
+    - name: Start Build
+      run: |
+        oc start-build taller-auto-git-alek -n dotnet-alejandra --follow
